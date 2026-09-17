@@ -432,6 +432,12 @@ function Appointments() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [reschedule, setReschedule] = useState(null);
+  const [rescheduleForm, setRescheduleForm] = useState({
+    appointment_date: "",
+    start_time: "",
+    end_time: "",
+  });
 
   const load = async (query = "") => {
     setLoading(true);
@@ -477,6 +483,45 @@ function Appointments() {
     } else {
       setMessage(data.message);
     }
+  };
+
+  const openReschedule = (appointment) => {
+    setReschedule(appointment);
+    setRescheduleForm({
+      appointment_date: appointment.appointment_date,
+      start_time: appointment.start_time,
+      end_time: appointment.end_time,
+    });
+    setMessage("");
+  };
+
+  const submitReschedule = async (e) => {
+    e.preventDefault();
+
+    if (!reschedule) return;
+
+    const res = await fetch(
+      `${API}/appointments/${reschedule.id}/reschedule`,
+      {
+        method: "PATCH",
+        headers: {
+          ...authHeaders(),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(rescheduleForm),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!data.success) {
+      setMessage(data.message || "Unable to reschedule appointment.");
+      return;
+    }
+
+    setReschedule(null);
+    setMessage("Appointment rescheduled successfully.");
+    load(search);
   };
 
   const submitSearch = (e) => {
@@ -591,12 +636,21 @@ function Appointments() {
 
                   <td className="p-4 text-right">
                     {a.status === "CONFIRMED" && (
-                      <button
-                        onClick={() => cancel(a.id)}
-                        className="text-red-600 text-sm font-semibold hover:underline"
-                      >
-                        Cancel
-                      </button>
+                      <div className="flex justify-end items-center gap-4">
+                        <button
+                          onClick={() => openReschedule(a)}
+                          className="text-blue-600 text-sm font-semibold hover:underline"
+                        >
+                          Reschedule
+                        </button>
+
+                        <button
+                          onClick={() => cancel(a.id)}
+                          className="text-red-600 text-sm font-semibold hover:underline"
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     )}
                   </td>
                 </tr>
@@ -617,6 +671,98 @@ function Appointments() {
           )}
         </div>
       </div>
+
+      {reschedule && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-6 z-50">
+          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl">
+            <div className="p-6 border-b flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">
+                  Reschedule Appointment
+                </h2>
+                <p className="text-sm text-slate-500 mt-1">
+                  {reschedule.patient_name} · {reschedule.doctor_name}
+                </p>
+              </div>
+
+              <button onClick={() => setReschedule(null)}>
+                <X />
+              </button>
+            </div>
+
+            <form onSubmit={submitReschedule} className="p-6 space-y-5">
+              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-700">
+                The same patient and doctor will be kept. ClinicFlow will
+                re-check the new time for doctor overlap before saving.
+              </div>
+
+              <Field label="New Appointment Date">
+                <input
+                  className="input"
+                  type="date"
+                  value={rescheduleForm.appointment_date}
+                  onChange={(e) =>
+                    setRescheduleForm({
+                      ...rescheduleForm,
+                      appointment_date: e.target.value,
+                    })
+                  }
+                  required
+                />
+              </Field>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="New Start Time">
+                  <input
+                    className="input"
+                    type="time"
+                    value={rescheduleForm.start_time}
+                    onChange={(e) =>
+                      setRescheduleForm({
+                        ...rescheduleForm,
+                        start_time: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </Field>
+
+                <Field label="New End Time">
+                  <input
+                    className="input"
+                    type="time"
+                    value={rescheduleForm.end_time}
+                    onChange={(e) =>
+                      setRescheduleForm({
+                        ...rescheduleForm,
+                        end_time: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </Field>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setReschedule(null)}
+                  className="flex-1 border border-slate-200 text-slate-700 py-3 rounded-xl font-semibold"
+                >
+                  Keep Current Time
+                </button>
+
+                <button
+                  type="submit"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold"
+                >
+                  Confirm Reschedule
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

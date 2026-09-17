@@ -497,3 +497,76 @@ Clear and maintainable project structure
 Because the application was developed under a strict time limit, the implementation focused first on the required functional workflow and then on improving the user interface and developer documentation.
 
 
+i means this is our solution have this or not
+Pasted text(20260917-114541).txt
+Document
+run this in  terminal ??
+
+Yes. Run that entire command in the terminal while you are in:
+
+/workspaces/clinicflow
+
+The text you uploaded is exactly the command we are talking about.
+
+But before running it, make sure your terminal shows:
+
+@imranalam8554 ➜ /workspaces/clinicflow $
+
+If it doesn't, first run:
+
+cd /workspaces/clinicflow
+
+Then paste the whole python - <<'PY' ... PY command and press Enter.
+
+After it finishes, it should say:
+
+Reschedule UI added successfully.
+
+Don't run the build yet. Send me what the terminal shows after this command, and I'll give you the next step.
+
+done
+
+Great. ✅
+
+Now let's check that the frontend code has no errors.
+
+Run only this command in the terminal:
+
+cd /workspaces/clinicflow/client && npm run build
+
+Send me the output.
+
+@imranalamb230442 ➜ /workspaces/clinicflow (main) $ cd /workspaces/clinicflow/client && npm run build
+
+> client@0.0.0 build
+> vite build
+
+vite v8.3.0 building client environment for production...
+✓ 1886 modules transformed.
+computing gzip size...
+dist/index.html                   0.45 kB │ gzip:  0.29 kB
+dist/assets/index-Dy530Yk5.css   18.76 kB │ gzip:  4.56 kB
+dist/assets/index-MSTTN0g-.js   290.54 kB │ gzip: 89.61 kB
+
+@imranalamb230442 ➜ /workspaces/clinicflow/client (main) $ 
+
+
+
+Perfect. ✅ Build succeeded with no errors.
+
+Now let's test the actual T6 Reschedule UI.
+
+Next step
+
+Go back to your running frontend in the browser.
+
+Open Appointments.
+You should now see:
+Reschedule | Cancel
+Click Reschedule on any CONFIRMED appointment.
+Change the date/time.
+Click Confirm Reschedule.
+
+For the first test, choose a free time slot.
+
+Send me a screenshot of the Reschedule popup after clicking the button.
